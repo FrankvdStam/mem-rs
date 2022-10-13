@@ -20,3 +20,10 @@ mod helpers;
 pub mod read_write;
 pub mod process;
 pub mod pointer;
+
+pub mod prelude
+{
+	pub use crate::read_write::*;
+	pub use crate::process::*;
+	pub use crate::pointer::*;
+}

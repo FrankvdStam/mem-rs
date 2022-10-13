@@ -54,9 +54,9 @@ impl Pointer
         }
     }
 
-    pub fn is_valid(&self) -> bool
+    pub fn get_base_address(&self) -> usize
     {
-        return self.process_data.borrow().attached;
+        return self.base_address;
     }
 
     fn resolve_offsets(&self, offsets: &Vec<usize>) -> usize
