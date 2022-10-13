@@ -23,7 +23,9 @@ homepage = "https://github.com/FrankvdStam/mem-rs"
 repository = "https://github.com/FrankvdStam/mem-rs"
 license-file = "LICENSE"
 keywords = ["memory", "gamedev"]
+categories = ["memory-management", "games", "development-tools"]
 description = "pattern scanning and abstraction for pointers in memory of running processes"
+
 
 [dependencies]
 
