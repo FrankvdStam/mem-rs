@@ -1,4 +1,5 @@
 # mem-rs
+[![Crates.io](https://img.shields.io/crates/v/mem-rs)](https://crates.io/crates/mem-rs)  
 pattern scanning and abstraction for pointers in memory of running processes
 
 ## example usage
