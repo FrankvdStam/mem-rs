@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+use std::thread;
 use std::thread::sleep;
 use std::time::Duration;
 use mem_rs::prelude::*;
@@ -79,4 +80,11 @@ fn main()
         println!("ai: {}", ds1.get_ai_timer());
         sleep(Duration::from_secs(1));
     }
+}
+
+fn inject()
+{
+    let mut process = Process::new("DarkSoulsRemastered.exe");
+    process.refresh().unwrap();
+    process.inject_dll(r#"C:\projects\soulmemory-rs\target\x86_64-pc-windows-msvc\debug\soulmemory_rs.dll"#);
 }
