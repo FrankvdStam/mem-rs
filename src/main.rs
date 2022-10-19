@@ -66,6 +66,12 @@ impl Ds1
 
 fn main()
 {
+    let processes = Process::get_running_process_names();
+    for p in &processes
+    {
+        println!("{}", p);
+    }
+
     let mut ds1 = Ds1::new();
 
     loop

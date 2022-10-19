@@ -117,17 +117,17 @@ impl Process
                     windows::Win32::System::Threading::PROCESS_VM_WRITE |
                     windows::Win32::System::Threading::PROCESS_VM_READ, false, self.process_data.borrow().id).unwrap();
 
-                println!("{:?}", process_handle);
+                //println!("{:?}", process_handle);
 
                 //Allocate a chunk of memory inside a process and write the path to the dll in this chunk
                 let allocated_dll_path_str = VirtualAllocEx(
                     process_handle,
-                    0 as *const c_void,
+                    None,
                     dll_path_null_terminated.len() * size_of::<u8>(),
                     MEM_COMMIT | MEM_RESERVE,
                     PAGE_READWRITE);
 
-                println!("{:?}", allocated_dll_path_str as *const ());
+                //println!("{:?}", allocated_dll_path_str as *const ());
 
                 self.write_memory_abs(
                     allocated_dll_path_str as usize,
@@ -307,6 +307,45 @@ impl Process
                 return Ok(filename);
             }
             Err(())
+        }
+    }
+
+    pub fn get_running_process_names() -> Vec<String>
+    {
+        unsafe
+        {
+            let mut process_names = Vec::new();
+            let mut process_ids = [0u32; 2048];
+            let mut bytes_needed = 0u32;
+            K32EnumProcesses(process_ids.as_mut_ptr(), (process_ids.len() * size_of::<u32>()) as u32, &mut bytes_needed);
+            let count = bytes_needed as usize / std::mem::size_of::<u32>();
+
+            for i in 0..count
+            {
+                let pid = process_ids[i];
+
+                let mut mod_name = [0; MAX_PATH as usize];
+
+                if let Ok(handle) = OpenProcess(
+                    PROCESS_QUERY_INFORMATION
+                        | PROCESS_VM_READ
+                        | PROCESS_VM_WRITE
+                        | PROCESS_VM_OPERATION,
+                    false,
+                    pid,
+                )
+                {
+                    if K32GetModuleFileNameExA(handle, HINSTANCE(0), &mut mod_name) != 0
+                    {
+                        let len  = mod_name.iter().position(|&r| r == 0).unwrap();
+                        let path = String::from_utf8(mod_name[0..len].iter().map(|&c| c as u8).collect()).unwrap();
+                        let filename = String::from(Path::new(&path).file_name().unwrap().to_str().unwrap());
+                        process_names.push(filename);
+                    }
+                    CloseHandle(handle);
+                }
+            }
+            return process_names;
         }
     }
 }

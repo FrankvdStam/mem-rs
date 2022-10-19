@@ -58,7 +58,8 @@ impl ProcessModule
         {
             let mut buffer: Vec<u8> = vec![0; self.size];
             let mut read_bytes = 0;
-            if !ReadProcessMemory(process_handle as HANDLE, self.base_address as *mut c_void, buffer.as_mut_ptr() as *mut c_void, buffer.capacity(), &mut read_bytes).as_bool()
+
+            if !ReadProcessMemory(process_handle as HANDLE, self.base_address as *mut c_void, buffer.as_mut_ptr() as *mut c_void, buffer.capacity(), Some(&mut read_bytes)).as_bool()
             {
                 return;
             }
