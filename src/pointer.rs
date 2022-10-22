@@ -25,6 +25,7 @@ pub struct Pointer
     is_64_bit: bool,
     base_address: usize,
     offsets: Vec<usize>,
+    pub debug: bool,
 }
 
 impl Default for Pointer
@@ -37,6 +38,7 @@ impl Default for Pointer
             is_64_bit: true,
             base_address: 0,
             offsets: Vec::new(),
+            debug: false,
         }
     }
 }
@@ -51,6 +53,7 @@ impl Pointer
             is_64_bit,
             base_address,
             offsets,
+            debug: false,
         }
     }
 
@@ -94,6 +97,10 @@ impl Pointer
 
                 if ptr == 0
                 {
+                    if self.debug
+                    {
+                        println!("{}", path);
+                    }
                     return 0;
                 }
             }
@@ -103,7 +110,10 @@ impl Pointer
                 path.push_str(format!("\n{:#010x} + {:#010x}: {:#010x}", debug_copy, offset, ptr).as_str());
             }
         }
-        //println!("{}", path);
+        if self.debug
+        {
+            println!("{}", path);
+        }
         return ptr;
     }
 }

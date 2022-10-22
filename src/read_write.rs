@@ -57,6 +57,17 @@ pub trait BaseReadWrite
 
 pub trait ReadWrite: BaseReadWrite
 {
+    ///==================================================================================================================================================================
+    /// Reading
+
+    ///Read an i8 from the given address
+    fn read_i8_rel(&self, address: Option<usize>) -> i8
+    {
+        let mut buffer = [0; 1];
+        self.read_memory_rel(address, &mut buffer);
+        return i8::from_ne_bytes(buffer);
+    }
+
     ///Read an i32 from the given address
     fn read_i32_rel(&self, address: Option<usize>) -> i32
     {
@@ -119,5 +130,64 @@ pub trait ReadWrite: BaseReadWrite
         let mut buffer = [0; 1];
         self.read_memory_rel(address, &mut buffer);
         return buffer[0] != 0;
+    }
+
+    ///==================================================================================================================================================================
+    /// Writing
+
+    ///Write an i8 to the given address
+    fn write_i8_rel(&self, address: Option<usize>, value: i8)
+    {
+        let buffer = value.to_ne_bytes();
+        self.write_memory_rel(address, &buffer);
+    }
+
+    ///Write an i32 to the given address
+    fn write_i32_rel(&self, address: Option<usize>, value: i32)
+    {
+        let buffer = value.to_ne_bytes();
+        self.write_memory_rel(address, &buffer);
+    }
+
+    ///Write an i64 to the given address
+    fn write_i64_rel(&self, address: Option<usize>, value: i64)
+    {
+        let buffer = value.to_ne_bytes();
+        self.write_memory_rel(address, &buffer);
+    }
+
+    ///Write an u8 to the given address
+    fn write_u8_rel(&self, address: Option<usize>, value: u8)
+    {
+        let buffer = value.to_ne_bytes();
+        self.write_memory_rel(address, &buffer);
+    }
+
+    ///Write an u32 to the given address
+    fn write_u32_rel(&self, address: Option<usize>, value: u32)
+    {
+        let buffer = value.to_ne_bytes();
+        self.write_memory_rel(address, &buffer);
+    }
+
+    ///Write an u64 to the given address
+    fn write_u64_rel(&self, address: Option<usize>, value: u64)
+    {
+        let buffer = value.to_ne_bytes();
+        self.write_memory_rel(address, &buffer);
+    }
+
+    ///Write an f32 to the given address
+    fn write_f32_rel(&self, address: Option<usize>, value: f32)
+    {
+        let buffer = value.to_ne_bytes();
+        self.write_memory_rel(address, &buffer);
+    }
+
+    ///Write an f64 to the given address
+    fn write_f64_rel(&self, address: Option<usize>, value: f64)
+    {
+        let buffer = value.to_ne_bytes();
+        self.write_memory_rel(address, &buffer);
     }
 }

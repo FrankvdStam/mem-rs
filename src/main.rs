@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-use std::thread;
 use std::thread::sleep;
 use std::time::Duration;
 use mem_rs::prelude::*;
@@ -88,6 +87,7 @@ fn main()
     }
 }
 
+#[allow(dead_code)]
 fn inject()
 {
     let mut process = Process::new("DarkSoulsRemastered.exe");
