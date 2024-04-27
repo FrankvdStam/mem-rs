@@ -22,7 +22,7 @@ use std::rc::Rc;
 use windows::Win32::Foundation::HMODULE;
 use windows::Win32::Foundation::{BOOL, CloseHandle, HANDLE, HINSTANCE, MAX_PATH};
 use windows::Win32::System::Memory::{MEM_COMMIT, MEM_RELEASE, MEM_RESERVE, PAGE_READWRITE, VirtualAllocEx, VirtualFreeEx};
-use windows::Win32::System::ProcessStatus::{K32EnumProcesses, K32EnumProcessModules, K32GetModuleFileNameExA, K32GetModuleFileNameExW, K32GetModuleInformation, MODULEINFO};
+use windows::Win32::System::ProcessStatus::{K32EnumProcesses, K32EnumProcessModules, K32GetModuleFileNameExA, K32GetModuleInformation, MODULEINFO};
 use windows::Win32::System::Threading::{GetCurrentProcess, GetExitCodeProcess, OpenProcess, PROCESS_CREATE_THREAD, PROCESS_QUERY_INFORMATION, PROCESS_VM_OPERATION, PROCESS_VM_READ, PROCESS_VM_WRITE};
 use crate::helpers::{scan, to_pattern};
 use crate::pointer::Pointer;
@@ -154,7 +154,7 @@ impl Process
                     0 as *const c_void);
                 WaitForSingleObject(thread, 10000);
 
-                VirtualFreeEx(process_handle, allocated_dll_path_str, 0, MEM_RELEASE);
+                let _ = VirtualFreeEx(process_handle, allocated_dll_path_str, 0, MEM_RELEASE);
             }
         }
     }
@@ -241,7 +241,7 @@ impl Process
                             }
                         }
 
-                        CloseHandle(handle);
+                        let _ = CloseHandle(handle);
                     }
                     _ => {},
                 }
@@ -318,7 +318,7 @@ impl Process
             let mut process_names = Vec::new();
             let mut process_ids = [0u32; 2048];
             let mut bytes_needed = 0u32;
-            K32EnumProcesses(process_ids.as_mut_ptr(), (process_ids.len() * size_of::<u32>()) as u32, &mut bytes_needed);
+            let _ = K32EnumProcesses(process_ids.as_mut_ptr(), (process_ids.len() * size_of::<u32>()) as u32, &mut bytes_needed);
             let count = bytes_needed as usize / std::mem::size_of::<u32>();
 
             for i in 0..count
@@ -343,7 +343,7 @@ impl Process
                         let filename = String::from(Path::new(&path).file_name().unwrap().to_str().unwrap());
                         process_names.push(filename);
                     }
-                    CloseHandle(handle);
+                    let _ = CloseHandle(handle);
                 }
             }
             return process_names;
