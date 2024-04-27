@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+use std::path::Path;
+
 pub fn scan(code: &[u8], pattern: &[Option<u8>]) -> Option<usize>
 {
     if code.len() == 0
@@ -58,4 +60,14 @@ pub fn to_pattern(str: &str) -> Vec<Option<u8>>
         }
     }
     return vec;
+}
+
+pub fn w32str_to_string(w32str: &Vec<u16>) -> String
+{
+    return w32str.iter().map(|&v| (v & 0xFF) as u8).take_while(|&c| c != 0).map(|c| c as char).collect();
+}
+
+pub fn get_file_name_from_string(str: &String) -> String
+{
+    return String::from(Path::new(&str).file_name().unwrap().to_str().unwrap());
 }

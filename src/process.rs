@@ -17,14 +17,13 @@
 use std::cell::RefCell;
 use std::ffi::c_void;
 use std::mem::size_of;
-use std::path::Path;
 use std::rc::Rc;
 use windows::Win32::Foundation::HMODULE;
 use windows::Win32::Foundation::{BOOL, CloseHandle, HANDLE, HINSTANCE, MAX_PATH};
 use windows::Win32::System::Memory::{MEM_COMMIT, MEM_RELEASE, MEM_RESERVE, PAGE_READWRITE, VirtualAllocEx, VirtualFreeEx};
-use windows::Win32::System::ProcessStatus::{K32EnumProcesses, K32EnumProcessModules, K32GetModuleFileNameExA, K32GetModuleInformation, MODULEINFO};
+use windows::Win32::System::ProcessStatus::{K32EnumProcesses, K32EnumProcessModules, K32GetModuleFileNameExW, K32GetModuleInformation, MODULEINFO};
 use windows::Win32::System::Threading::{GetCurrentProcess, GetExitCodeProcess, OpenProcess, PROCESS_CREATE_THREAD, PROCESS_QUERY_INFORMATION, PROCESS_VM_OPERATION, PROCESS_VM_READ, PROCESS_VM_WRITE};
-use crate::helpers::{scan, to_pattern};
+use crate::helpers::{get_file_name_from_string, scan, to_pattern, w32str_to_string};
 use crate::pointer::Pointer;
 use crate::process_data::ProcessData;
 use crate::process_module::ProcessModule;
@@ -214,15 +213,14 @@ impl Process
                     {
                         let mut mod_name = [0; windows::Win32::Foundation::MAX_PATH as usize];
 
-                        if K32GetModuleFileNameExA(handle, HINSTANCE(0), &mut mod_name) != 0
+                        if K32GetModuleFileNameExW(handle, HINSTANCE(0), &mut mod_name) != 0
                         {
-                            let len  = mod_name.iter().position(|&r| r == 0).unwrap();
-                            let path = String::from_utf8(mod_name[0..len].iter().map(|&c| c as u8).collect()).unwrap();
-                            let filename = String::from(Path::new(&path).file_name().unwrap().to_str().unwrap());
+                            let file_path = w32str_to_string(&mod_name.to_vec());
+                            let file_name = get_file_name_from_string(&file_path);
 
                             //println!("{}", filename);
 
-                            if self.process_data.borrow().name.to_lowercase() == filename.to_lowercase()
+                            if self.process_data.borrow().name.to_lowercase() == file_name.to_lowercase()
                             {
                                 let mut modules = Process::get_process_modules(handle);
 
@@ -230,8 +228,8 @@ impl Process
 
                                 process_data.id = pid;
                                 process_data.handle = handle;
-                                process_data.filename = filename;
-                                process_data.path = path;
+                                process_data.filename = file_name;
+                                process_data.path = file_path;
                                 process_data.attached = true;
                                 process_data.main_module = modules.remove(0);
                                 process_data.main_module.dump_memory(handle);
@@ -269,11 +267,10 @@ impl Process
             {
                 let mut mod_name = [0; MAX_PATH as usize];
 
-                if K32GetModuleFileNameExA(process_handle, modules[i as usize], &mut mod_name) != 0
+                if K32GetModuleFileNameExW(process_handle, modules[i as usize], &mut mod_name) != 0
                 {
-                    let len  = mod_name.iter().position(|&r| r == 0).unwrap();
-                    let file_path = String::from_utf8(mod_name[0..len].iter().map(|&c| c as u8).collect()).unwrap();
-                    let file_name = Path::new(&file_path).file_name().unwrap().to_os_string().into_string().unwrap();
+                    let file_path = w32str_to_string(&mod_name.to_vec());
+                    let file_name = get_file_name_from_string(&file_path);
 
                     let mut info: MODULEINFO = MODULEINFO
                     {
@@ -300,12 +297,11 @@ impl Process
         {
             let handle = GetCurrentProcess();
             let mut mod_name = [0; MAX_PATH as usize];
-            if K32GetModuleFileNameExA(handle, HINSTANCE(0), &mut mod_name) != 0
+            if K32GetModuleFileNameExW(handle, HINSTANCE(0), &mut mod_name) != 0
             {
-                let len  = mod_name.iter().position(|&r| r == 0).unwrap();
-                let path = String::from_utf8(mod_name[0..len].iter().map(|&c| c as u8).collect()).unwrap();
-                let filename = String::from(Path::new(&path).file_name().unwrap().to_str().unwrap());
-                return Ok(filename);
+                let file_path = w32str_to_string(&mod_name.to_vec());
+                let file_name = get_file_name_from_string(&file_path);
+                return Ok(file_name);
             }
             Err(())
         }
@@ -336,12 +332,11 @@ impl Process
                     pid,
                 )
                 {
-                    if K32GetModuleFileNameExA(handle, HINSTANCE(0), &mut mod_name) != 0
+                    if K32GetModuleFileNameExW(handle, HINSTANCE(0), &mut mod_name) != 0
                     {
-                        let len  = mod_name.iter().position(|&r| r == 0).unwrap();
-                        let path = String::from_utf8(mod_name[0..len].iter().map(|&c| c as u8).collect()).unwrap();
-                        let filename = String::from(Path::new(&path).file_name().unwrap().to_str().unwrap());
-                        process_names.push(filename);
+                        let file_path = w32str_to_string(&mod_name.to_vec());
+                        let file_name = get_file_name_from_string(&file_path);
+                        process_names.push(file_name);
                     }
                     let _ = CloseHandle(handle);
                 }
