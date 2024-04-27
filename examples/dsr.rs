@@ -65,11 +65,11 @@ impl Ds1
 
 fn main()
 {
-    let processes = Process::get_running_process_names();
-    for p in &processes
-    {
-        println!("{}", p);
-    }
+    //let processes = Process::get_running_process_names();
+    //for p in &processes
+    //{
+    //    println!("{}", p);
+    //}
 
     let mut ds1 = Ds1::new();
 
@@ -94,3 +94,4 @@ fn inject()
     process.refresh().unwrap();
     process.inject_dll(r#"C:\projects\soulmemory-rs\target\x86_64-pc-windows-msvc\debug\soulmemory_rs.dll"#);
 }
+
