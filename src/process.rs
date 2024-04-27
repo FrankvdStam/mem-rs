@@ -19,10 +19,11 @@ use std::ffi::c_void;
 use std::mem::size_of;
 use std::path::Path;
 use std::rc::Rc;
+use windows::Win32::Foundation::HMODULE;
 use windows::Win32::Foundation::{BOOL, CloseHandle, HANDLE, HINSTANCE, MAX_PATH};
 use windows::Win32::System::Memory::{MEM_COMMIT, MEM_RELEASE, MEM_RESERVE, PAGE_READWRITE, VirtualAllocEx, VirtualFreeEx};
-use windows::Win32::System::ProcessStatus::{K32EnumProcesses, K32EnumProcessModules, K32GetModuleFileNameExA, K32GetModuleInformation, MODULEINFO};
-use windows::Win32::System::Threading::{GetCurrentProcess, GetExitCodeProcess, OpenProcess, PROCESS_QUERY_INFORMATION, PROCESS_VM_OPERATION, PROCESS_VM_READ, PROCESS_VM_WRITE};
+use windows::Win32::System::ProcessStatus::{K32EnumProcesses, K32EnumProcessModules, K32GetModuleFileNameExA, K32GetModuleFileNameExW, K32GetModuleInformation, MODULEINFO};
+use windows::Win32::System::Threading::{GetCurrentProcess, GetExitCodeProcess, OpenProcess, PROCESS_CREATE_THREAD, PROCESS_QUERY_INFORMATION, PROCESS_VM_OPERATION, PROCESS_VM_READ, PROCESS_VM_WRITE};
 use crate::helpers::{scan, to_pattern};
 use crate::pointer::Pointer;
 use crate::process_data::ProcessData;
@@ -111,11 +112,11 @@ impl Process
             if self.is_attached()
             {
                 let process_handle = OpenProcess(
-                    windows::Win32::System::Threading::PROCESS_CREATE_THREAD |
-                    windows::Win32::System::Threading::PROCESS_QUERY_INFORMATION |
-                    windows::Win32::System::Threading::PROCESS_VM_OPERATION |
-                    windows::Win32::System::Threading::PROCESS_VM_WRITE |
-                    windows::Win32::System::Threading::PROCESS_VM_READ, false, self.process_data.borrow().id).unwrap();
+                    PROCESS_CREATE_THREAD |
+                    PROCESS_QUERY_INFORMATION |
+                    PROCESS_VM_OPERATION |
+                    PROCESS_VM_WRITE |
+                    PROCESS_VM_READ, false, self.process_data.borrow().id).unwrap();
 
                 //println!("{:?}", process_handle);
 
@@ -166,7 +167,7 @@ impl Process
         {
             //Check if a previously attached process has exited
             let mut lp_exit_code: u32 = 0;
-            if self.process_data.borrow().attached && (!GetExitCodeProcess(self.process_data.borrow().handle, &mut lp_exit_code).as_bool() || lp_exit_code != STILL_ACTIVE)
+            if self.process_data.borrow().attached && (!GetExitCodeProcess(self.process_data.borrow().handle, &mut lp_exit_code).is_ok() || lp_exit_code != STILL_ACTIVE)
             {
                 let mut process_data = self.process_data.borrow_mut();
 
@@ -257,12 +258,12 @@ impl Process
 
             //Get amount of hmodules in current process
             let mut required_size: u32 = 0;
-            K32EnumProcessModules(process_handle, 0 as *mut HINSTANCE, 0, &mut required_size);
+            let _ = K32EnumProcessModules(process_handle, 0 as *mut HMODULE, 0, &mut required_size);
             let size = (required_size / size_of::<HINSTANCE>() as u32) as u32;
 
             //Get modules
-            let mut modules: Vec<HINSTANCE> = vec![HINSTANCE(0); size as usize];
-            K32EnumProcessModules(process_handle, modules.as_mut_ptr(), required_size.clone(), &mut required_size);
+            let mut modules: Vec<HMODULE> = vec![HMODULE(0); size as usize];
+            let _ = K32EnumProcessModules(process_handle, modules.as_mut_ptr(), required_size.clone(), &mut required_size).unwrap();
 
             for i in 0..modules.len()
             {
