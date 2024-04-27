@@ -16,7 +16,7 @@
 
 mod process_data;
 mod process_module;
-mod helpers;
+pub mod helpers;
 pub mod read_write;
 pub mod process;
 pub mod pointer;

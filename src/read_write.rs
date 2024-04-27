@@ -36,7 +36,7 @@ pub trait BaseReadWrite
     fn read_with_handle(&self, handle: HANDLE, address: usize, buffer: &mut [u8]) -> bool
     {
         let mut read_bytes = 0;
-        if !unsafe {ReadProcessMemory(handle, address as *mut c_void, buffer.as_mut_ptr() as *mut c_void, buffer.len(), Some(&mut read_bytes)).as_bool() }
+        if unsafe {ReadProcessMemory(handle, address as *mut c_void, buffer.as_mut_ptr() as *mut c_void, buffer.len(), Some(&mut read_bytes)).is_err() }
         {
             return false;
         }
@@ -47,7 +47,7 @@ pub trait BaseReadWrite
     fn write_with_handle(&self, handle: HANDLE, address: usize, buffer: &[u8]) -> bool
     {
         let mut wrote_bytes = 0;
-        if !unsafe { WriteProcessMemory(handle, address as *mut c_void, buffer.as_ptr() as *mut c_void, buffer.len(), Some(&mut wrote_bytes)).as_bool() }
+        if unsafe { WriteProcessMemory(handle, address as *mut c_void, buffer.as_ptr() as *mut c_void, buffer.len(), Some(&mut wrote_bytes)).is_err() }
         {
             return false;
         }

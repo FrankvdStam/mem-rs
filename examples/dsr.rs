@@ -16,6 +16,7 @@
 
 use std::thread::sleep;
 use std::time::Duration;
+use mem_rs::helpers::{get_w32str_from_str, vec_u16_to_u8};
 use mem_rs::prelude::*;
 
 struct Ds1
@@ -61,15 +62,34 @@ impl Ds1
         }
         Ok(())
     }
+
+    #[allow(dead_code)]
+    pub fn inject_soulmemory_rs(&self)
+    {
+        //self.process.inject_dll(r#"C:\soulmemory\soulmemory_rs.dll"#);
+        //self.process.inject_dll(r#"C:\projects\soulmemory-rs\target\x86_64-pc-windows-msvc\release\soulmemory_rs.dll"#);
+        self.process.inject_dll(r#"C:\projects\soulmemory-rs\target\x86_64-pc-windows-msvc\å\soulmemory_rs.dll"#).expect("TODO: panic message");
+    }
 }
 
 fn main()
 {
-    //let processes = Process::get_running_process_names();
-    //for p in &processes
-    //{
-    //    println!("{}", p);
-    //}
+    let str = r#"C:\soulmemory\soulmemory_rs.dll"#;
+    let w32_str = get_w32str_from_str(str);
+    println!("{:?}", w32_str);
+    println!("{:?}", vec_u16_to_u8(&w32_str));
+
+    let alloated_str = String::from(str);
+    let collected: Vec<u16> = alloated_str.encode_utf16().collect();
+    println!("{:?}", collected);
+    unsafe { println!("{:?}", collected.align_to::<u8>()); }
+
+
+    let processes = Process::get_running_process_names();
+    for p in &processes
+    {
+        println!("{}", p);
+    }
 
     let mut ds1 = Ds1::new();
 
@@ -81,17 +101,10 @@ fn main()
             Err(e) => println!("{}", e)
         }
 
+        //ds1.inject_soulmemory_rs();
+
         println!("igt: {}", ds1.get_in_game_time_milliseconds());
         println!("ai: {}", ds1.get_ai_timer());
         sleep(Duration::from_secs(1));
     }
 }
-
-#[allow(dead_code)]
-fn inject()
-{
-    let mut process = Process::new("DarkSoulsRemastered.exe");
-    process.refresh().unwrap();
-    process.inject_dll(r#"C:\projects\soulmemory-rs\target\x86_64-pc-windows-msvc\debug\soulmemory_rs.dll"#);
-}
-

@@ -14,6 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+use std::path::Path;
+use windows::core::{PCSTR, PCWSTR};
+
 pub fn scan(code: &[u8], pattern: &[Option<u8>]) -> Option<usize>
 {
     if code.len() == 0
@@ -58,4 +61,34 @@ pub fn to_pattern(str: &str) -> Vec<Option<u8>>
         }
     }
     return vec;
+}
+
+pub fn vec_u16_to_u8(vec_u16: &Vec<u16>) -> Vec<u8>
+{
+    return unsafe { vec_u16.align_to::<u8>().1.to_vec() };
+}
+
+pub fn w32str_to_string(w32str: &Vec<u16>) -> String
+{
+    return w32str.iter().map(|&v| (v & 0xFF) as u8).take_while(|&c| c != 0).map(|c| c as char).collect();
+}
+
+pub fn get_file_name_from_string(str: &String) -> String
+{
+    return String::from(Path::new(&str).file_name().unwrap().to_str().unwrap());
+}
+
+pub fn get_w32str_from_str(str: &str) -> Vec<u16>
+{
+    return str.encode_utf16().collect();
+}
+pub fn get_pcwstr_from_str(str: &str) -> PCWSTR
+{
+    let vec: Vec<u16> = str.encode_utf16().collect();
+    return PCWSTR(vec.as_ptr());
+}
+
+pub fn get_pcstr_from_str(str: &str) -> PCSTR
+{
+    return PCSTR(str.as_ptr());
 }
