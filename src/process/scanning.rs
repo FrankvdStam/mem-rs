@@ -34,4 +34,9 @@ impl Process
 
         return Ok(Pointer::new(self.process_data.clone(), true, result, pointer_offsets));
     }
+
+    pub fn create_pointer(&self, address: usize, pointer_offsets: Vec<usize>) -> Pointer
+    {
+        return Pointer::new(self.process_data.clone(), true, address, pointer_offsets);
+    }
 }
