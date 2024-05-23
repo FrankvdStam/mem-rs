@@ -1,6 +1,14 @@
 # mem-rs
 [![Crates.io](https://img.shields.io/crates/v/mem-rs)](https://crates.io/crates/mem-rs)  
-pattern scanning and abstraction for pointers in memory of running processes
+Memory manipulation library for running processes, mainly aimed at games.
+
+## Features
+- Process abstraction
+- Reading and writing to process memory
+- Pattern scanning in the process's main module
+- Pointer abstraction and offset resolving
+- Reading and writing relatively from a pointer
+- dll injection
 
 ## example usage
 
