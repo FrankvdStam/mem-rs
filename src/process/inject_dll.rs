@@ -1,3 +1,19 @@
+// This file is part of the mem-rs distribution (https://github.com/FrankvdStam/mem-rs).
+// Copyright (c) 2022 Frank van der Stam.
+// https://github.com/FrankvdStam/mem-rs/blob/main/LICENSE
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, version 3.
+//
+// This program is distributed in the hope that it will be useful, but
+// WITHOUT ANY WARRANTY without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+// General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
+
 use std::ffi::c_void;
 use std::mem::size_of;
 use windows::Win32::System::LibraryLoader::{GetModuleHandleW, GetProcAddress};
@@ -9,6 +25,17 @@ use crate::prelude::*;
 
 impl Process
 {
+    /// Attempts to inject a dll into the attached process using LoadLibraryW
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use mem_rs::prelude::*;
+    ///
+    /// let mut process = Process::new("name_of_process.exe");
+    /// process.refresh().expect("Failed to attach/refresh!");
+    /// process.inject_dll(r#"C:\temp\native.dll"#).expect("Failed to inject!");
+    /// ```
     pub fn inject_dll(&self, dll_path: &str) -> Result<(), String>
     {
         let mut path_w32_str: Vec<u16> = dll_path.encode_utf16().collect();

@@ -79,8 +79,8 @@ fn main()
     println!("{:?}", w32_str);
     println!("{:?}", vec_u16_to_u8(&w32_str));
 
-    let alloated_str = String::from(str);
-    let collected: Vec<u16> = alloated_str.encode_utf16().collect();
+    let allocated_str = String::from(str);
+    let collected: Vec<u16> = allocated_str.encode_utf16().collect();
     println!("{:?}", collected);
     unsafe { println!("{:?}", collected.align_to::<u8>()); }
 
