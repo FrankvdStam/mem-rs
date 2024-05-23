@@ -19,12 +19,28 @@ use std::rc::Rc;
 use crate::read_write::{BaseReadWrite, ReadWrite};
 use crate::process_data::ProcessData;
 
+
+/// Represents a pointer path that is dynamically resolved each read/write operation.
+/// This ensures that the pointer is always valid. Race conditions can occur and the pointer could encounter
+/// a null pointer along the path. Should always be constructed via the Process struct.
+///
+/// # Example
+///
+/// ```
+/// use mem_rs::prelude::*;
+///
+/// let mut process = Process::new("name_of_process.exe");
+/// process.refresh()?;
+/// let pointer = process.create_pointer(0x1234, vec![0]);
+/// let data = pointer.read_u8_rel(Some(0x1234));
+/// ```
 pub struct Pointer
 {
     process_data: Rc<RefCell<ProcessData>>,
     is_64_bit: bool,
     base_address: usize,
     offsets: Vec<usize>,
+    /// Set this to true to print each memory address while resolving the pointer path.
     pub debug: bool,
 }
 
@@ -45,7 +61,7 @@ impl Default for Pointer
 
 impl Pointer
 {
-    pub fn new(process_data: Rc<RefCell<ProcessData>>, is_64_bit: bool, base_address: usize, offsets: Vec<usize>) -> Self
+    pub(crate) fn new(process_data: Rc<RefCell<ProcessData>>, is_64_bit: bool, base_address: usize, offsets: Vec<usize>) -> Self
     {
         Pointer
         {
@@ -57,6 +73,7 @@ impl Pointer
         }
     }
 
+    /// Get the base address of this pointer, without resolving offsets.
     pub fn get_base_address(&self) -> usize
     {
         return self.base_address;

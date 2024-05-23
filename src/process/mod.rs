@@ -30,7 +30,21 @@ mod process_name;
 
 const STILL_ACTIVE: u32 = 259;
 
-
+/// Wraps a native process and allows memory access/manipulation
+///
+/// # Examples
+///
+/// ```
+/// use mem_rs::prelude::*;
+///
+/// let mut process = Process::new("name_of_process.exe");
+/// if process.refresh().is_ok()
+/// {
+///     process.write_memory_abs(0x1234, &u32::to_ne_bytes(10));
+///     let result = process.read_u32_rel(Some(0x1234));
+///     println!("Result: {}", result);
+/// }
+/// ```
 pub struct Process
 {
     process_data: Rc<RefCell<ProcessData>>
@@ -38,7 +52,15 @@ pub struct Process
 
 impl Process
 {
-    ///Create a new process where name is the name of the executable
+    /// Creates a new process based on the process name.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use mem_rs::prelude::*;
+    ///
+    /// let mut process = Process::new("name_of_process.exe");
+    /// ```
     pub fn new(name: &str) -> Self
     {
         Process
@@ -57,6 +79,23 @@ impl Process
         }
     }
 
+    /// Returns if the process is "attached" and can be read/written from/to
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use mem_rs::prelude::*;
+    ///
+    /// let mut process = Process::new("name_of_process.exe");
+    /// //returns false
+    /// let not_attached = process.is_attached();
+    ///
+    /// //refreshing the process will cause it to become attached
+    /// process.refresh().unwrap();
+    ///
+    /// //if name_of_process.exe is running, will return true
+    /// let attached = process.is_attached();
+    /// ```
     pub fn is_attached(&self) -> bool {return self.process_data.borrow().attached;}
 }
 
