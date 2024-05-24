@@ -1,5 +1,7 @@
 # mem-rs
-[![Crates.io](https://img.shields.io/crates/v/mem-rs)](https://crates.io/crates/mem-rs)  
+[![Crates.io](https://img.shields.io/crates/v/mem-rs)](https://crates.io/crates/mem-rs) 
+[![Crates.io](https://img.shields.io/crates/d/mem-rs)](https://crates.io/crates/mem-rs) 
+[![build](https://github.com/FrankvdStam/mem-rs/actions/workflows/build.yml/badge.svg)](https://github.com/FrankvdStam/mem-rs/actions/workflows/build.yml)  
 Memory manipulation library for running processes, mainly aimed at games.
 
 ## Features
