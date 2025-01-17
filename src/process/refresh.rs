@@ -15,7 +15,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 use std::mem::size_of;
-use windows::Win32::Foundation::{BOOL, CloseHandle, HANDLE, HINSTANCE};
+use windows::Win32::Foundation::{BOOL, CloseHandle, HANDLE, HMODULE};
 use windows::Win32::System::ProcessStatus::{K32EnumProcesses, K32GetModuleFileNameExW};
 use windows::Win32::System::Threading::{GetExitCodeProcess, OpenProcess, PROCESS_QUERY_INFORMATION, PROCESS_VM_OPERATION, PROCESS_VM_READ, PROCESS_VM_WRITE};
 use crate::helpers::{get_file_name_from_string, w32str_to_string};
@@ -90,7 +90,7 @@ impl Process
                     {
                         let mut mod_name = [0; windows::Win32::Foundation::MAX_PATH as usize];
 
-                        if K32GetModuleFileNameExW(handle, HINSTANCE(0), &mut mod_name) != 0
+                        if K32GetModuleFileNameExW(handle, HMODULE::default(), &mut mod_name) != 0
                         {
                             let file_path = w32str_to_string(&mod_name.to_vec());
                             let file_name = get_file_name_from_string(&file_path);

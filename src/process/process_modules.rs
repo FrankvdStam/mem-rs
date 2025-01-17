@@ -36,7 +36,7 @@ impl Process
                 let size = (required_size / size_of::<HINSTANCE>() as u32) as u32;
 
                 //Get modules
-                let mut modules: Vec<HMODULE> = vec![HMODULE(0); size as usize];
+                let mut modules: Vec<HMODULE> = vec![HMODULE::default(); size as usize];
                 let _ = K32EnumProcessModules(process_handle, modules.as_mut_ptr(), required_size.clone(), &mut required_size).unwrap();
 
                 for i in 0..modules.len()
