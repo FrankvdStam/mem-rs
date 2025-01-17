@@ -97,5 +97,18 @@ impl Process
     /// let attached = process.is_attached();
     /// ```
     pub fn is_attached(&self) -> bool {return self.process_data.borrow().attached;}
-}
 
+    /// Returns file path of the processes' executable
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use mem_rs::prelude::*;
+    /// 
+    /// let mut process = Process::new("name_of_process.exe");
+    /// process.refresh().unwrap();
+    /// 
+    /// println!("{}", process.get_path());
+    /// ```
+    pub fn get_path(&self) -> String {return self.process_data.borrow().path.clone();}
+}
