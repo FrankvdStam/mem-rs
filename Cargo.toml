@@ -27,7 +27,7 @@ categories = ["memory-management", "games", "development-tools"]
 description = "pattern scanning and abstraction for pointers in memory of running processes"
 
 [dependencies.windows]
-version = "0.58.0"
+version = "0.59.0"
 features = [
     "Win32_Foundation",
     "Win32_System_Memory",
