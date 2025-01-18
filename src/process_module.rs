@@ -18,6 +18,7 @@ use std::ffi::c_void;
 use windows::Win32::Foundation::{HANDLE};
 use windows::Win32::System::Diagnostics::Debug::ReadProcessMemory;
 
+#[allow(dead_code)]
 pub struct ProcessModule
 {
     pub id: usize,
