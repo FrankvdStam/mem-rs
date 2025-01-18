@@ -111,4 +111,21 @@ impl Process
     /// println!("{}", process.get_path());
     /// ```
     pub fn get_path(&self) -> String {return self.process_data.borrow().path.clone();}
+
+    /// Returns modules of a process
+    ///
+    /// # Examples
+    /// ```
+    /// use mem_rs::prelude::*;
+    /// 
+    /// let mut process = Process::new("name_of_process.exe");
+    /// process.refresh().unwrap();
+    /// 
+    /// let process_modules = process.get_modules();
+    /// 
+    /// for process_module in process_modules {
+    ///     println!("{}", process_module.name);
+    /// }
+    /// ```
+    pub fn get_modules(&self) -> Vec<ProcessModule> {return self.process_data.borrow().modules.clone();}
 }
