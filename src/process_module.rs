@@ -19,6 +19,7 @@ use windows::Win32::Foundation::{HANDLE};
 use windows::Win32::System::Diagnostics::Debug::ReadProcessMemory;
 
 #[allow(dead_code)]
+#[derive(Clone)]
 pub struct ProcessModule
 {
     pub id: usize,
