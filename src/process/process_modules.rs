@@ -36,14 +36,14 @@ impl Process
                 let size = (required_size / size_of::<HINSTANCE>() as u32) as u32;
 
                 //Get modules
-                let mut modules: Vec<HMODULE> = vec![HMODULE(0); size as usize];
+                let mut modules: Vec<HMODULE> = vec![HMODULE::default(); size as usize];
                 let _ = K32EnumProcessModules(process_handle, modules.as_mut_ptr(), required_size.clone(), &mut required_size).unwrap();
 
                 for i in 0..modules.len()
                 {
                     let mut mod_name = [0; MAX_PATH as usize];
 
-                    if K32GetModuleFileNameExW(process_handle, modules[i as usize], &mut mod_name) != 0
+                    if K32GetModuleFileNameExW(Some(process_handle), Some(modules[i as usize]), &mut mod_name) != 0
                     {
                         let file_path = w32str_to_string(&mod_name.to_vec());
                         let file_name = get_file_name_from_string(&file_path);
