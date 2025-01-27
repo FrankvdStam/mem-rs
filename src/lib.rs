@@ -25,5 +25,6 @@ pub mod prelude
 {
 	pub use crate::read_write::*;
 	pub use crate::process::*;
+        pub use crate::process_module::*;
 	pub use crate::pointer::*;
 }

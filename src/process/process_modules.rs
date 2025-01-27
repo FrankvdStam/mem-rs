@@ -24,7 +24,7 @@ use crate::process_module::ProcessModule;
 
 impl Process
 {
-    pub(crate) fn get_process_modules(process_handle: HANDLE) -> Vec<ProcessModule>
+    pub fn get_process_modules(process_handle: HANDLE) -> Vec<ProcessModule>
     {
         unsafe
             {
