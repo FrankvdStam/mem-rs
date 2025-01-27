@@ -111,4 +111,14 @@ impl Process
     /// println!("{}", process.get_path());
     /// ```
     pub fn get_path(&self) -> String {return self.process_data.borrow().path.clone();}
+
+    /// Returns handle of a process
+    pub fn get_handle(&self) -> HANDLE {
+        return self.process_data.borrow().handle.clone();
+    }
+
+    /// Returns id of a process
+    pub fn get_id(&self) -> u32 {
+        return self.process_data.borrow().id.clone();
+    }
 }
