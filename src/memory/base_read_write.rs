@@ -1,6 +1,8 @@
 use std::ffi::c_void;
+use std::ptr;
 use windows::Win32::Foundation::HANDLE;
 use windows::Win32::System::Diagnostics::Debug::{ReadProcessMemory, WriteProcessMemory};
+use crate::memory::MemoryType;
 
 pub trait BaseReadWrite
 {
@@ -69,24 +71,47 @@ pub trait BaseReadWrite
     fn write_memory_abs(&self, address: usize, buffer: &[u8]) -> bool;
 
     /// Read memory into a buffer from a process handle
-    fn read_with_handle(&self, handle: HANDLE, address: usize, buffer: &mut [u8]) -> bool
+    fn read_with_handle(&self, handle: HANDLE, memory_type: MemoryType, address: usize, buffer: &mut [u8]) -> bool
     {
-        let mut read_bytes = 0;
-        if unsafe {ReadProcessMemory(handle, address as *mut c_void, buffer.as_mut_ptr() as *mut c_void, buffer.len(), Some(&mut read_bytes)).is_err() }
+        return match memory_type
         {
-            return false;
+            MemoryType::Win32Api =>
+            {
+                let mut read_bytes = 0;
+                if unsafe { ReadProcessMemory(handle, address as *mut c_void, buffer.as_mut_ptr() as *mut c_void, buffer.len(), Some(&mut read_bytes)).is_err() }
+                {
+                    return false;
+                }
+                read_bytes == buffer.len()
+            },
+            MemoryType::Direct =>
+            {
+                let slice = unsafe { std::slice::from_raw_parts(address as *const u8, buffer.len()) };
+                buffer.clone_from_slice(slice);
+                true //error handling?
+            }
         }
-        return read_bytes == buffer.len();
     }
 
     /// Write from a buffer ino memory from a process handle
-    fn write_with_handle(&self, handle: HANDLE, address: usize, buffer: &[u8]) -> bool
+    fn write_with_handle(&self, handle: HANDLE, memory_type: MemoryType, address: usize, buffer: &[u8]) -> bool
     {
-        let mut wrote_bytes = 0;
-        if unsafe { WriteProcessMemory(handle, address as *mut c_void, buffer.as_ptr() as *mut c_void, buffer.len(), Some(&mut wrote_bytes)).is_err() }
+        return match memory_type
         {
-            return false;
+            MemoryType::Win32Api =>
+            {
+                let mut wrote_bytes = 0;
+                if unsafe { WriteProcessMemory(handle, address as *mut c_void, buffer.as_ptr() as *mut c_void, buffer.len(), Some(&mut wrote_bytes)).is_err() }
+                {
+                    return false;
+                }
+                wrote_bytes == buffer.len()
+            },
+            MemoryType::Direct =>
+            {
+                unsafe{ ptr::write_volatile(address as *mut &[u8], buffer); }
+                true
+            },
         }
-        return wrote_bytes == buffer.len();
     }
 }

@@ -16,7 +16,6 @@
 
 use std::thread::sleep;
 use std::time::Duration;
-use mem_rs::helpers::{get_w32str_from_str, vec_u16_to_u8};
 use mem_rs::prelude::*;
 
 struct Ds1
@@ -74,22 +73,12 @@ impl Ds1
 
 fn main()
 {
-    let str = r#"C:\soulmemory\soulmemory_rs.dll"#;
-    let w32_str = get_w32str_from_str(str);
-    println!("{:?}", w32_str);
-    println!("{:?}", vec_u16_to_u8(&w32_str));
-
-    let allocated_str = String::from(str);
-    let collected: Vec<u16> = allocated_str.encode_utf16().collect();
-    println!("{:?}", collected);
-    unsafe { println!("{:?}", collected.align_to::<u8>()); }
-
-
+    /*
     let processes = Process::get_running_process_names();
     for p in &processes
     {
         println!("{}", p);
-    }
+    }*/
 
     let mut ds1 = Ds1::new();
 

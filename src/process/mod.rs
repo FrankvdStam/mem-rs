@@ -16,10 +16,9 @@
 
 use std::cell::RefCell;
 use std::rc::Rc;
-
 use windows::Win32::Foundation::HANDLE;
-
-use crate::process_data::ProcessData;
+use crate::memory::MemoryType;
+use crate::process_data::{ProcessData};
 use crate::process_module::ProcessModule;
 mod inject_dll;
 mod scanning;
@@ -47,6 +46,8 @@ const STILL_ACTIVE: u32 = 259;
 /// ```
 pub struct Process
 {
+    main_module: Option<ProcessModule>, //cache for pattern scans
+    modules: Vec<ProcessModule>, //cache for pattern scans
     process_data: Rc<RefCell<ProcessData>>
 }
 
@@ -65,16 +66,48 @@ impl Process
     {
         Process
         {
+            main_module: None,
+            modules: Vec::new(),
             process_data: Rc::new(RefCell::new(ProcessData
             {
                 name: String::from(name),
                 attached: false,
+                memory_type: MemoryType::Win32Api,
                 id: 0,
                 handle: HANDLE::default(),
+                is_64_bit: true,
                 filename: String::new(),
                 path: String::new(),
-                main_module: ProcessModule::default(),
-                modules: Vec::new(),
+            }))
+        }
+    }
+
+
+    /// Creates a new process based on the process name.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use mem_rs::prelude::*;
+    ///
+    /// let mut process = Process::new_with_memory_type("name_of_process.exe", MemoryType::Direct);
+    /// ```
+    pub fn new_with_memory_type(name: &str, memory_type: MemoryType) -> Self
+    {
+        Process
+        {
+            main_module: None,
+            modules: Vec::new(),
+            process_data: Rc::new(RefCell::new(ProcessData
+            {
+                name: String::from(name),
+                attached: false,
+                memory_type,
+                id: 0,
+                handle: HANDLE::default(),
+                is_64_bit: true,
+                filename: String::new(),
+                path: String::new(),
             }))
         }
     }
@@ -112,6 +145,8 @@ impl Process
     /// ```
     pub fn get_path(&self) -> String {return self.process_data.borrow().path.clone();}
 
+    pub fn is_64_bit(&self) -> bool {return self.process_data.borrow().is_64_bit.clone();  }
+
     /// Returns handle of a process
     pub fn get_handle(&self) -> HANDLE {
         return self.process_data.borrow().handle.clone();
@@ -120,5 +155,22 @@ impl Process
     /// Returns id of a process
     pub fn get_id(&self) -> u32 {
         return self.process_data.borrow().id.clone();
+    }
+
+    ///Returns a copy of the main module
+    pub fn get_main_module(&self) -> ProcessModule
+    {
+        return self.main_module.as_ref().unwrap().clone();
+    }
+
+    ///returns a copy of all modules
+    pub fn get_modules(&self) -> Vec<ProcessModule>
+    {
+        self.modules.clone()
+    }
+    ///returns if the process is using win32 API's to read/write memory
+    pub fn get_memory_type(&self) -> MemoryType
+    {
+        return self.process_data.borrow().memory_type.clone();
     }
 }

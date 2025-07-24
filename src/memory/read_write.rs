@@ -193,7 +193,7 @@ pub trait ReadWrite: BaseReadWrite
     /// process.refresh()?;
     /// let pointer = process.create_pointer(0x1234, vec![0]);
     ///
-    /// let data = pointer.read_f32_rel(Some(0x1234));
+    /// let data = pointer.read_bool_rel(Some(0x1234));
     /// ```
     fn read_bool_rel(&self, address: Option<usize>) -> bool
     {
@@ -201,6 +201,194 @@ pub trait ReadWrite: BaseReadWrite
         self.read_memory_rel(address, &mut buffer);
         return buffer[0] != 0;
     }
+
+
+
+    /// Absolute read an i8 from an address. Ignores offsets. Sugar for read_memory_abs.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use mem_rs::prelude::*;
+    ///
+    /// let mut process = Process::new("name_of_process.exe");
+    /// process.refresh()?;
+    /// let pointer = process.create_pointer(0x1234, vec![0]);
+    ///
+    /// let data = pointer.read_i8_abs(0x1234);
+    /// ```
+    fn read_i8_abs(&self, address: usize) -> i8
+    {
+        let mut buffer = [0; 1];
+        self.read_memory_abs(address, &mut buffer);
+        return i8::from_ne_bytes(buffer);
+    }
+
+    /// Absolute read an i32 from an address. Ignores offsets. Sugar for read_memory_abs.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use mem_rs::prelude::*;
+    ///
+    /// let mut process = Process::new("name_of_process.exe");
+    /// process.refresh()?;
+    /// let pointer = process.create_pointer(0x1234, vec![0]);
+    ///
+    /// let data = pointer.read_i32_abs(0x1234);
+    /// ```
+    fn read_i32_abs(&self, address: usize) -> i32
+    {
+        let mut buffer = [0; 4];
+        self.read_memory_abs(address, &mut buffer);
+        return i32::from_ne_bytes(buffer);
+    }
+
+    /// Absolute read an i64 from an address. Ignores offsets. Sugar for read_memory_abs.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use mem_rs::prelude::*;
+    ///
+    /// let mut process = Process::new("name_of_process.exe");
+    /// process.refresh()?;
+    /// let pointer = process.create_pointer(0x1234, vec![0]);
+    ///
+    /// let data = pointer.read_i64_abs(0x1234);
+    /// ```
+    fn read_i64_abs(&self, address: usize) -> i64
+    {
+        let mut buffer = [0; 8];
+        self.read_memory_abs(address, &mut buffer);
+        return i64::from_ne_bytes(buffer);
+    }
+
+    /// Absolute read an u8 from an address. Ignores offsets. Sugar for read_memory_abs.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use mem_rs::prelude::*;
+    ///
+    /// let mut process = Process::new("name_of_process.exe");
+    /// process.refresh()?;
+    /// let pointer = process.create_pointer(0x1234, vec![0]);
+    ///
+    /// let data = pointer.read_u8_abs(0x1234);
+    /// ```
+    fn read_u8_abs(&self, address: usize) -> u8
+    {
+        let mut buffer = [0; 1];
+        self.read_memory_abs(address, &mut buffer);
+        return buffer[0];
+    }
+
+    /// Absolute read an u32 from an address. Ignores offsets. Sugar for read_memory_abs.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use mem_rs::prelude::*;
+    ///
+    /// let mut process = Process::new("name_of_process.exe");
+    /// process.refresh()?;
+    /// let pointer = process.create_pointer(0x1234, vec![0]);
+    ///
+    /// let data = pointer.read_u32_abs(0x1234);
+    /// ```
+    fn read_u32_abs(&self, address: usize) -> u32
+    {
+        let mut buffer = [0; 4];
+        self.read_memory_abs(address, &mut buffer);
+        return u32::from_ne_bytes(buffer);
+    }
+
+    /// Absolute read an u64 from an address. Ignores offsets. Sugar for read_memory_abs.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use mem_rs::prelude::*;
+    ///
+    /// let mut process = Process::new("name_of_process.exe");
+    /// process.refresh()?;
+    /// let pointer = process.create_pointer(0x1234, vec![0]);
+    ///
+    /// let data = pointer.read_u64_abs(0x1234);
+    /// ```
+    fn read_u64_abs(&self, address: usize) -> u64
+    {
+        let mut buffer = [0; 8];
+        self.read_memory_abs(address, &mut buffer);
+        return u64::from_ne_bytes(buffer);
+    }
+
+    /// Absolute read an f32 from an address. Ignores offsets. Sugar for read_memory_abs.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use mem_rs::prelude::*;
+    ///
+    /// let mut process = Process::new("name_of_process.exe");
+    /// process.refresh()?;
+    /// let pointer = process.create_pointer(0x1234, vec![0]);
+    ///
+    /// let data = pointer.read_f32_abs(0x1234);
+    /// ```
+    fn read_f32_abs(&self, address: usize) -> f32
+    {
+        let mut buffer = [0; 4];
+        self.read_memory_abs(address, &mut buffer);
+        return f32::from_ne_bytes(buffer);
+    }
+
+    /// Absolute read an f64 from an address. Ignores offsets. Sugar for read_memory_abs.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use mem_rs::prelude::*;
+    ///
+    /// let mut process = Process::new("name_of_process.exe");
+    /// process.refresh()?;
+    /// let pointer = process.create_pointer(0x1234, vec![0]);
+    ///
+    /// let data = pointer.read_f64_abs(0x1234);
+    /// ```
+    fn read_f64_abs(&self, address: usize) -> f64
+    {
+        let mut buffer = [0; 8];
+        self.read_memory_abs(address, &mut buffer);
+        return f64::from_ne_bytes(buffer);
+    }
+
+    /// Absolute read a byte from an address. Ignores offsets. Sugar for read_memory_abs.
+    /// The value of the bool is true if this byte is non-zero.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use mem_rs::prelude::*;
+    ///
+    /// let mut process = Process::new("name_of_process.exe");
+    /// process.refresh()?;
+    /// let pointer = process.create_pointer(0x1234, vec![0]);
+    ///
+    /// let data = pointer.read_bool_abs(0x1234);
+    /// ```
+    fn read_bool_abs(&self, address: usize) -> bool
+    {
+        let mut buffer = [0; 1];
+        self.read_memory_abs(address, &mut buffer);
+        return buffer[0] != 0;
+    }
+
+
+
+
+
 
     //==================================================================================================================================================================
     //Writing
@@ -363,5 +551,165 @@ pub trait ReadWrite: BaseReadWrite
     {
         let buffer = value.to_ne_bytes();
         self.write_memory_rel(address, &buffer);
+    }
+
+    /// Absolute write an i8
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use mem_rs::prelude::*;
+    ///
+    /// let mut process = Process::new("name_of_process.exe");
+    /// process.refresh()?;
+    /// let pointer = process.create_pointer(0x1234, vec![0]);
+    ///
+    /// let data: i8 = 10;
+    /// pointer.write_i8_abs(0x1234, data);
+    /// ```
+    fn write_i8_abs(&self, address: usize, value: i8)
+    {
+        let buffer = value.to_ne_bytes();
+        self.write_memory_abs(address, &buffer);
+    }
+
+    /// Absolute write an i32
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use mem_rs::prelude::*;
+    ///
+    /// let mut process = Process::new("name_of_process.exe");
+    /// process.refresh()?;
+    /// let pointer = process.create_pointer(0x1234, vec![0]);
+    ///
+    /// let data: i32 = 10;
+    /// pointer.write_i32_abs(0x1234, data);
+    /// ```
+    fn write_i32_abs(&self, address: usize, value: i32)
+    {
+        let buffer = value.to_ne_bytes();
+        self.write_memory_abs(address, &buffer);
+    }
+
+    /// Absolute write an i64
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use mem_rs::prelude::*;
+    ///
+    /// let mut process = Process::new("name_of_process.exe");
+    /// process.refresh()?;
+    /// let pointer = process.create_pointer(0x1234, vec![0]);
+    ///
+    /// let data: i64 = 10;
+    /// pointer.write_i64_abs(0x1234, data);
+    /// ```
+    fn write_i64_abs(&self, address: usize, value: i64)
+    {
+        let buffer = value.to_ne_bytes();
+        self.write_memory_abs(address, &buffer);
+    }
+
+    /// Absolute write an u8
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use mem_rs::prelude::*;
+    ///
+    /// let mut process = Process::new("name_of_process.exe");
+    /// process.refresh()?;
+    /// let pointer = process.create_pointer(0x1234, vec![0]);
+    ///
+    /// let data: u8 = 10;
+    /// pointer.write_u8_abs(0x1234, data);
+    /// ```
+    fn write_u8_abs(&self, address: usize, value: u8)
+    {
+        let buffer = value.to_ne_bytes();
+        self.write_memory_abs(address, &buffer);
+    }
+
+    /// Absolute write an u32
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use mem_rs::prelude::*;
+    ///
+    /// let mut process = Process::new("name_of_process.exe");
+    /// process.refresh()?;
+    /// let pointer = process.create_pointer(0x1234, vec![0]);
+    ///
+    /// let data: u32 = 10;
+    /// pointer.write_u32_abs(0x1234, data);
+    /// ```
+    fn write_u32_abs(&self, address: usize, value: u32)
+    {
+        let buffer = value.to_ne_bytes();
+        self.write_memory_abs(address, &buffer);
+    }
+
+    /// Absolute write an u64
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use mem_rs::prelude::*;
+    ///
+    /// let mut process = Process::new("name_of_process.exe");
+    /// process.refresh()?;
+    /// let pointer = process.create_pointer(0x1234, vec![0]);
+    ///
+    /// let data: u64 = 10;
+    /// pointer.write_u64_abs(0x1234, data);
+    /// ```
+    fn write_u64_abs(&self, address: usize, value: u64)
+    {
+        let buffer = value.to_ne_bytes();
+        self.write_memory_abs(address, &buffer);
+    }
+
+    /// Absolute write an f32
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use mem_rs::prelude::*;
+    ///
+    /// let mut process = Process::new("name_of_process.exe");
+    /// process.refresh()?;
+    /// let pointer = process.create_pointer(0x1234, vec![0]);
+    ///
+    /// let data: f32 = 10.0f32;
+    /// pointer.write_f32_abs(0x1234, data);
+    /// ```
+    fn write_f32_abs(&self, address: usize, value: f32)
+    {
+        let buffer = value.to_ne_bytes();
+        self.write_memory_abs(address, &buffer);
+    }
+
+    /// Absolute write an f64
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use mem_rs::prelude::*;
+    ///
+    /// let mut process = Process::new("name_of_process.exe");
+    /// process.refresh()?;
+    /// let pointer = process.create_pointer(0x1234, vec![0]);
+    ///
+    /// let data: f64 = 10.0f64;
+    /// pointer.write_f64_abs(0x1234, data);
+    /// ```
+    fn write_f64_abs(&self, address: usize, value: f64)
+    {
+        let buffer = value.to_ne_bytes();
+        self.write_memory_abs(address, &buffer);
     }
 }

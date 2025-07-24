@@ -145,7 +145,7 @@ impl BaseReadWrite for Pointer
             copy.push(offset.unwrap());
         }
         let address = self.resolve_offsets(&copy);
-        return self.read_with_handle(self.process_data.borrow().handle, address, buffer);
+        return self.read_with_handle(self.process_data.borrow().handle, self.process_data.borrow().memory_type.clone(), address, buffer);
     }
 
     fn write_memory_rel(&self, offset: Option<usize>, buffer: &[u8]) -> bool
@@ -156,17 +156,17 @@ impl BaseReadWrite for Pointer
             copy.push(offset.unwrap());
         }
         let address = self.resolve_offsets(&copy);
-        return self.write_with_handle(self.process_data.borrow().handle, address, buffer);
+        return self.write_with_handle(self.process_data.borrow().handle, self.process_data.borrow().memory_type.clone(), address, buffer);
     }
 
     fn read_memory_abs(&self, address: usize, buffer: &mut [u8]) -> bool
     {
-        return self.read_with_handle(self.process_data.borrow().handle, address, buffer);
+        return self.read_with_handle(self.process_data.borrow().handle, self.process_data.borrow().memory_type.clone(), address, buffer);
     }
 
     fn write_memory_abs(&self, address: usize, buffer: &[u8]) -> bool
     {
-        return self.write_with_handle(self.process_data.borrow().handle, address, buffer);
+        return self.write_with_handle(self.process_data.borrow().handle, self.process_data.borrow().memory_type.clone(), address, buffer);
     }
 }
 

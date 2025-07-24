@@ -15,13 +15,12 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 use std::mem::size_of;
-use windows::Win32::Foundation::{CloseHandle, HANDLE};
+use windows::Win32::Foundation::{CloseHandle, FALSE, HANDLE};
 use windows::Win32::System::ProcessStatus::{K32EnumProcesses, K32GetModuleFileNameExW};
-use windows::Win32::System::Threading::{GetExitCodeProcess, OpenProcess, PROCESS_QUERY_INFORMATION, PROCESS_VM_OPERATION, PROCESS_VM_READ, PROCESS_VM_WRITE};
+use windows::Win32::System::Threading::{GetExitCodeProcess, IsWow64Process, OpenProcess, PROCESS_QUERY_INFORMATION, PROCESS_VM_OPERATION, PROCESS_VM_READ, PROCESS_VM_WRITE};
 use crate::helpers::{get_file_name_from_string, w32str_to_string};
 use crate::prelude::Process;
 use crate::process::STILL_ACTIVE;
-use crate::process_module::ProcessModule;
 
 impl Process
 {
@@ -52,8 +51,6 @@ impl Process
                 process_data.handle = HANDLE::default();
                 process_data.filename = String::new();
                 process_data.path = String::new();
-                process_data.main_module = ProcessModule::default();
-                process_data.modules = Vec::new();
 
                 return Err(String::from("Process exited"));
             }
@@ -99,20 +96,26 @@ impl Process
 
                             if self.process_data.borrow().name.to_lowercase() == file_name.to_lowercase()
                             {
-                                let mut modules = Process::get_process_modules(handle);
+                                let mut wow64 = FALSE;
+                                if IsWow64Process(handle, &mut wow64).is_ok()
+                                {
+                                    let mut modules = Process::get_process_modules(handle, &self.process_data);
+                                    let mut main_module = modules.remove(0);
+                                    main_module.dump_memory();
 
-                                let mut process_data = self.process_data.borrow_mut();
+                                    let mut process_data = self.process_data.borrow_mut();
 
-                                process_data.id = pid;
-                                process_data.handle = handle;
-                                process_data.filename = file_name;
-                                process_data.path = file_path;
-                                process_data.attached = true;
-                                process_data.main_module = modules.remove(0);
-                                process_data.main_module.dump_memory(handle);
-                                process_data.modules = modules;
+                                    process_data.id = pid;
+                                    process_data.is_64_bit = !wow64.as_bool();
+                                    process_data.filename = file_name;
+                                    process_data.path = file_path;
+                                    process_data.attached = true;
 
-                                return Ok(());
+                                    self.main_module = Some(main_module);
+                                    self.modules = modules;
+
+                                    return Ok(());
+                                }
                             }
                         }
 
