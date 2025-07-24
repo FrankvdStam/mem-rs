@@ -68,4 +68,9 @@ impl ProcessModule
             self.memory = buffer;
         }
     }
+
+    pub fn get_exports()
+    {
+
+    }
 }

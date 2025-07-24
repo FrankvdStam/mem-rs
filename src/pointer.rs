@@ -16,7 +16,7 @@
 
 use std::cell::RefCell;
 use std::rc::Rc;
-use crate::read_write::{BaseReadWrite, ReadWrite};
+use crate::memory::{BaseReadWrite, ReadWrite};
 use crate::process_data::ProcessData;
 
 

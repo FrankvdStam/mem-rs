@@ -16,14 +16,14 @@
 
 mod process_data;
 mod process_module;
+pub mod memory;
 pub mod helpers;
-pub mod read_write;
 pub mod process;
 pub mod pointer;
 
 pub mod prelude
 {
-	pub use crate::read_write::*;
+	pub use crate::memory::*;
 	pub use crate::process::*;
 	pub use crate::process_module::*;
 	pub use crate::pointer::*;
