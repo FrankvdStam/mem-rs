@@ -106,6 +106,7 @@ impl Process
                                     let mut process_data = self.process_data.borrow_mut();
 
                                     process_data.id = pid;
+                                    process_data.handle = handle;
                                     process_data.is_64_bit = !wow64.as_bool();
                                     process_data.filename = file_name;
                                     process_data.path = file_path;
