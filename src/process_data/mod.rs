@@ -15,11 +15,12 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 use windows::Win32::Foundation::HANDLE;
-use crate::process_module::ProcessModule;
+use crate::memory::{MemoryType};
 
 pub struct ProcessData
 {
     pub attached: bool,
+    pub memory_type: MemoryType,
     pub name: String,
 
     pub filename: String,
@@ -27,9 +28,7 @@ pub struct ProcessData
 
     pub id: u32,
     pub handle: HANDLE,
-
-    pub main_module: ProcessModule,
-    pub modules: Vec<ProcessModule>,
+    pub is_64_bit: bool,
 }
 
 impl Default for ProcessData
@@ -40,12 +39,12 @@ impl Default for ProcessData
         {
             name: String::new(),
             attached: false,
+            memory_type: MemoryType::Win32Api,
             id: 0,
             handle: HANDLE::default(),
+            is_64_bit: true,
             filename: String::new(),
             path: String::new(),
-            main_module: ProcessModule::default(),
-            modules: Vec::new(),
         }
     }
 }

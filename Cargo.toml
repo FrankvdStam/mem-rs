@@ -16,8 +16,8 @@
 
 [package]
 name = "mem-rs"
-version = "0.2.1"
-edition = "2021"
+version = "0.2.2"
+edition = "2024"
 readme = "README.md"
 homepage = "https://github.com/FrankvdStam/mem-rs"
 repository = "https://github.com/FrankvdStam/mem-rs"
@@ -27,11 +27,12 @@ categories = ["memory-management", "games", "development-tools"]
 description = "pattern scanning and abstraction for pointers in memory of running processes"
 
 [dependencies.windows]
-version = "0.59.0"
+version = "0.61.3"
 features = [
     "Win32_Foundation",
     "Win32_System_Memory",
     "Win32_System_Diagnostics_Debug",
+    "Win32_System_SystemInformation",
     "Win32_System_ProcessStatus",
     "Win32_System_Threading",
     "Win32_System_Console",
