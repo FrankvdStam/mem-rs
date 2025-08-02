@@ -19,6 +19,7 @@ mod read_write;
 use std::cell::RefCell;
 use std::mem;
 use std::rc::Rc;
+use windows::Win32::Foundation::HANDLE;
 use windows::Win32::System::Diagnostics::Debug::{IMAGE_NT_HEADERS32, IMAGE_NT_HEADERS64};
 use windows::Win32::System::SystemServices::{IMAGE_DOS_HEADER, IMAGE_EXPORT_DIRECTORY};
 use crate::memory::{BaseReadWrite, ReadWrite};
@@ -64,15 +65,14 @@ impl ProcessModule
         ProcessModule { process_data, id, path, name, base_address: base, size, memory: Vec::new() }
     }
 
-    pub fn dump_memory(&mut self)
+    pub fn dump_memory(&mut self, process_handle: HANDLE)
     {
         let mut buffer: Vec<u8> = vec![0; self.size];
-        if !self.read_memory_abs(self.base_address, &mut buffer)
+        if !self.read_with_handle(process_handle, self.process_data.borrow().memory_type.clone(), self.base_address, &mut buffer)
         {
             return;
         }
         self.memory = buffer;
-
     }
 
     pub fn get_exports(&self) -> Vec<(String, usize)>

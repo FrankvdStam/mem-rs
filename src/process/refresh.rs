@@ -101,7 +101,7 @@ impl Process
                                 {
                                     let mut modules = Process::get_process_modules(handle, &self.process_data);
                                     let mut main_module = modules.remove(0);
-                                    main_module.dump_memory();
+                                    main_module.dump_memory(handle);
 
                                     let mut process_data = self.process_data.borrow_mut();
 
