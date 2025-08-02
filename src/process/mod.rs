@@ -164,8 +164,9 @@ impl Process
     }
 
     ///returns a copy of all modules
-    pub fn get_modules(&self) -> Vec<ProcessModule>
+    pub fn get_modules(&mut self) -> Vec<ProcessModule>
     {
+        self.modules = Process::get_process_modules(self.process_data.borrow().handle.clone(), &self.process_data);
         self.modules.clone()
     }
     ///returns if the process is using win32 API's to read/write memory
