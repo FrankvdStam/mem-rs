@@ -55,11 +55,6 @@ impl Process
                 return Err(String::from("Process exited"));
             }
 
-            if self.process_data.borrow().attached
-            {
-                return Ok(());
-            }
-
             //Look for a running process with the correct name and attach to it
             let mut process_ids = [0u32; 2048];
             let mut out_size = 0;
