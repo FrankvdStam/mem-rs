@@ -47,7 +47,6 @@ const STILL_ACTIVE: u32 = 259;
 pub struct Process
 {
     main_module: Option<ProcessModule>, //cache for pattern scans
-    modules: Vec<ProcessModule>, //cache for pattern scans
     process_data: Rc<RefCell<ProcessData>>
 }
 
@@ -67,7 +66,6 @@ impl Process
         Process
         {
             main_module: None,
-            modules: Vec::new(),
             process_data: Rc::new(RefCell::new(ProcessData
             {
                 name: String::from(name),
@@ -97,7 +95,6 @@ impl Process
         Process
         {
             main_module: None,
-            modules: Vec::new(),
             process_data: Rc::new(RefCell::new(ProcessData
             {
                 name: String::from(name),
@@ -164,10 +161,9 @@ impl Process
     }
 
     ///returns a copy of all modules
-    pub fn get_modules(&mut self) -> Vec<ProcessModule>
+    pub fn get_modules(&self) -> Vec<ProcessModule>
     {
-        self.modules = Process::get_process_modules(self.process_data.borrow().handle.clone(), &self.process_data);
-        self.modules.clone()
+        return Process::get_process_modules(self.process_data.borrow().handle.clone(), &self.process_data);
     }
     ///returns if the process is using win32 API's to read/write memory
     pub fn get_memory_type(&self) -> MemoryType
