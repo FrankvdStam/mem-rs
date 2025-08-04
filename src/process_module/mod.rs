@@ -72,7 +72,6 @@ impl ProcessModule
             return;
         }
         self.memory = buffer;
-
     }
 
     pub fn get_exports(&self) -> Vec<(String, usize)>

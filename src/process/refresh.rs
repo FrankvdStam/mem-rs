@@ -99,21 +99,18 @@ impl Process
                                 let mut wow64 = FALSE;
                                 if IsWow64Process(handle, &mut wow64).is_ok()
                                 {
-                                    let mut modules = Process::get_process_modules(handle, &self.process_data);
-                                    let mut main_module = modules.remove(0);
-                                    main_module.dump_memory();
-
                                     let mut process_data = self.process_data.borrow_mut();
-
                                     process_data.id = pid;
                                     process_data.handle = handle;
                                     process_data.is_64_bit = !wow64.as_bool();
                                     process_data.filename = file_name;
                                     process_data.path = file_path;
                                     process_data.attached = true;
+                                    drop(process_data);
 
+                                    let mut main_module = Process::get_process_modules(handle, &self.process_data).remove(0);
+                                    main_module.dump_memory();
                                     self.main_module = Some(main_module);
-                                    self.modules = modules;
 
                                     return Ok(());
                                 }
