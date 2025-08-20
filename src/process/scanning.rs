@@ -45,7 +45,7 @@ impl Process
         let mut address = scan_result.unwrap();
         address += self.get_main_module().base_address;
         address += scan_offset;
-        return Ok(Pointer::new(self.process_data.clone(), true, address, pointer_offsets));
+        return Ok(Pointer::new(self.process_data.clone(), self.is_64_bit(), address, pointer_offsets));
     }
 
     /// Does a relative scan (for x64 targets) where the target pointer is located relative to instruction's
@@ -75,7 +75,7 @@ impl Process
         let address_value = self.read_u32_rel(Some(address + scan_offset));
         let result = self.get_main_module().base_address + address + instruction_size + address_value as usize; //Relative jump
 
-        return Ok(Pointer::new(self.process_data.clone(), true, result, pointer_offsets));
+        return Ok(Pointer::new(self.process_data.clone(), self.is_64_bit(), result, pointer_offsets));
     }
 
     /// Create a pointer without scanning from an absolute address and a list of offsets.
