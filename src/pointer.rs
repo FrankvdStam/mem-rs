@@ -37,11 +37,22 @@ use crate::process_data::ProcessData;
 pub struct Pointer
 {
     process_data: Rc<RefCell<ProcessData>>,
-    is_64_bit: bool,
-    base_address: usize,
-    offsets: Vec<usize>,
+    pub is_64_bit: bool,
+    pub base_address: usize,
+    pub offsets: Vec<usize>,
     /// Set this to true to print each memory address while resolving the pointer path.
     pub debug: bool,
+}
+
+unsafe impl Sync for Pointer {}
+unsafe impl Send for Pointer {}
+
+impl Clone for Pointer
+{
+    fn clone(&self) -> Pointer
+    {
+        Self::new(self.process_data.clone(), self.is_64_bit, self.base_address, self.offsets.clone())
+    }
 }
 
 impl Default for Pointer

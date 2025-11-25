@@ -50,6 +50,9 @@ pub struct Process
     process_data: Rc<RefCell<ProcessData>>
 }
 
+unsafe impl Sync for Process {}
+unsafe impl Send for Process {}
+
 impl Process
 {
     /// Creates a new process based on the process name.
