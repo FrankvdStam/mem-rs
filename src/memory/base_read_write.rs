@@ -20,7 +20,7 @@ pub trait BaseReadWrite
     /// let mut buffer: [u8; 8] = [0; 8];
     /// let success = pointer.read_memory_rel(Some(0x1234), &mut buffer);
     /// ```
-    fn read_memory_rel(&self, offset: Option<usize>, buffer: &mut [u8]) -> bool;
+    fn read_memory_rel(&self, offset: Option<usize>, buffer: &mut [u8]) -> Result<(), ()>;
 
     /// Write memory relative to the object's location in memory. Supports an optional offset.
     ///
@@ -36,7 +36,7 @@ pub trait BaseReadWrite
     /// let mut buffer: [u8; 4] = [0x1, 0x2, 0x3, 0x4];
     /// let success = pointer.write_memory_rel(Some(0x1234), &mut buffer);
     /// ```
-    fn write_memory_rel(&self, offset: Option<usize>, buffer: &[u8]) -> bool;
+    fn write_memory_rel(&self, offset: Option<usize>, buffer: &[u8]) -> Result<(), ()>;
 
     /// Read memory from an absolute address
     ///
@@ -52,7 +52,7 @@ pub trait BaseReadWrite
     /// let mut buffer: [u8; 8] = [0; 8];
     /// let success = pointer.read_memory_abs(0x1234, &mut buffer);
     /// ```
-    fn read_memory_abs(&self, address: usize, buffer: &mut [u8]) -> bool;
+    fn read_memory_abs(&self, address: usize, buffer: &mut [u8]) -> Result<(), ()>;
 
     /// Write memory to an absolute address
     ///
@@ -68,10 +68,10 @@ pub trait BaseReadWrite
     /// let mut buffer: [u8; 4] = [0x1, 0x2, 0x3, 0x4];
     /// let success = pointer.write_memory_abs(0x1234, &mut buffer);
     /// ```
-    fn write_memory_abs(&self, address: usize, buffer: &[u8]) -> bool;
+    fn write_memory_abs(&self, address: usize, buffer: &[u8]) -> Result<(), ()>;
 
     /// Read memory into a buffer from a process handle
-    fn read_with_handle(&self, handle: HANDLE, memory_type: MemoryType, address: usize, buffer: &mut [u8]) -> bool
+    fn read_with_handle(&self, handle: HANDLE, memory_type: MemoryType, address: usize, buffer: &mut [u8]) -> Result<(), ()>
     {
         return match memory_type
         {
@@ -79,22 +79,28 @@ pub trait BaseReadWrite
             {
                 let mut read_bytes = 0;
                 if unsafe { ReadProcessMemory(handle, address as *mut c_void, buffer.as_mut_ptr() as *mut c_void, buffer.len(), Some(&mut read_bytes)).is_err() }
+                    || read_bytes != buffer.len()
                 {
-                    return false;
+                    return Err(());
                 }
-                read_bytes == buffer.len()
+                return Ok(());
             },
             MemoryType::Direct =>
             {
+                if address == 0
+                {
+                    return Err(());
+                }
+
                 let slice = unsafe { std::slice::from_raw_parts(address as *const u8, buffer.len()) };
                 buffer.clone_from_slice(slice);
-                true //error handling?
+                return Ok(());
             }
         }
     }
 
     /// Write from a buffer ino memory from a process handle
-    fn write_with_handle(&self, handle: HANDLE, memory_type: MemoryType, address: usize, buffer: &[u8]) -> bool
+    fn write_with_handle(&self, handle: HANDLE, memory_type: MemoryType, address: usize, buffer: &[u8]) -> Result<(), ()>
     {
         return match memory_type
         {
@@ -102,15 +108,20 @@ pub trait BaseReadWrite
             {
                 let mut wrote_bytes = 0;
                 if unsafe { WriteProcessMemory(handle, address as *mut c_void, buffer.as_ptr() as *mut c_void, buffer.len(), Some(&mut wrote_bytes)).is_err() }
+                    || wrote_bytes != buffer.len()
                 {
-                    return false;
+                    return Err(());
                 }
-                wrote_bytes == buffer.len()
+                return Ok(());
             },
             MemoryType::Direct =>
             {
+                if address == 0
+                {
+                    return Err(());
+                }
                 unsafe{ ptr::write_volatile(address as *mut &[u8], buffer); }
-                true
+                return Ok(());
             },
         }
     }

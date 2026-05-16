@@ -67,7 +67,7 @@ impl ProcessModule
     pub fn dump_memory(&mut self)
     {
         let mut buffer: Vec<u8> = vec![0; self.size];
-        if !self.read_memory_abs(self.base_address, &mut buffer)
+        if self.read_memory_abs(self.base_address, &mut buffer).is_err()
         {
             return;
         }
