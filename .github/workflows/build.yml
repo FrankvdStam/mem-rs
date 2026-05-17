@@ -32,7 +32,6 @@ jobs:
     - name: Install cargo-sonar and run Clippy
       run: |
         cargo install cargo-sonar
-        cargo clippy --message-format json > my-clippy-report.json
         cargo sonar --clippy --clippy-path my-clippy-report.json
 
     - name: Generate code coverage
@@ -46,5 +45,4 @@ jobs:
         SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
       with:
         args: >
-          -Dsonar.externalIssuesReportPaths=sonar-issues.json
-          -Dcommunity.rust.lcov.reportPaths=lcov.info
+          -sonar.rust.lcov.reportPaths=lcov.info
