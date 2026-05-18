@@ -20,6 +20,7 @@ pub mod memory;
 pub mod helpers;
 pub mod process;
 pub mod pointer;
+mod tests;
 
 pub mod prelude
 {
