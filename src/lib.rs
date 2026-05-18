@@ -20,6 +20,8 @@ pub mod memory;
 pub mod helpers;
 pub mod process;
 pub mod pointer;
+
+#[cfg(test)]
 mod tests;
 
 pub mod prelude
