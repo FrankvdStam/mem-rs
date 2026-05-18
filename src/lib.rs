@@ -14,6 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+#[cfg(test)]
+mod tests;
+
 mod process_data;
 mod process_module;
 pub mod memory;
@@ -21,8 +24,7 @@ pub mod helpers;
 pub mod process;
 pub mod pointer;
 
-#[cfg(test)]
-mod tests;
+
 
 pub mod prelude
 {

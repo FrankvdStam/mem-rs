@@ -1,3 +1,6 @@
+mod game_object;
+mod direct_memory_tests;
+
 use std::io::Read;
 use std::process::{Command, Stdio};
 use std::thread;
