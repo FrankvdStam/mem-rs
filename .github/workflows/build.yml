@@ -24,9 +24,9 @@ jobs:
       run: cargo build --verbose
 
     - name: Test
-      run: test --lib
+      run: cargo test --lib
 
-    - name: doc
+    - name: Doc
       run: cargo doc --verbose
 
     - name: Install cargo-sonar and run Clippy
