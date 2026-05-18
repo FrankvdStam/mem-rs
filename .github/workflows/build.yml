@@ -21,7 +21,7 @@ jobs:
       run: cargo build --verbose
 
     - name: Test
-      run: test --lib --verbose
+      run: test --lib
 
     - name: doc
       run: cargo doc --verbose
