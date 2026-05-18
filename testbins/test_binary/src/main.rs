@@ -20,7 +20,7 @@ pub struct GameObject
 }
 
 #[unsafe(no_mangle)]
-pub static GLOBAL_GAME_OBJECT: &'static GameObject = &GameObject
+pub static GLOBAL_GAME_OBJECT: GameObject = GameObject
 {
     health: 58.2f32,
     xp: 58271,
@@ -40,9 +40,8 @@ fn main()
     let x = read_game_object_health();
     println!("x: {}", x);
 
-    loop
-    {
-        thread::sleep(Duration::from_secs(1));
+    loop{
+        thread::sleep(Duration::from_millis(1000));
     }
 }
 
@@ -51,15 +50,15 @@ pub fn read_game_object_health() -> f32
 {
     let mut x: f32;
     unsafe
-    {
-        asm!(
-        "mov rax, [{0}]", //load from global into rax
-        "test rax,rax",             //check if null
-        "mov rcx, [rax]",      //read position ptr into rcx
-        in(reg) &GLOBAL_GAME_OBJECT,
-        out("rcx") x);
-        //in(reg) &GLOBAL_GAME_OBJECT);
-    }
+        {
+            asm!(
+            "/*  */",
+            "test rax,rax",
+            "mov rcx, [rax]",
+
+            in("rax") &GLOBAL_GAME_OBJECT,
+            out("rcx") x);
+        }
 
     return x;
 }
