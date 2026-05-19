@@ -1,7 +1,10 @@
 # mem-rs
 [![Crates.io](https://img.shields.io/crates/v/mem-rs)](https://crates.io/crates/mem-rs) 
 [![Crates.io](https://img.shields.io/crates/d/mem-rs)](https://crates.io/crates/mem-rs) 
-[![build](https://github.com/FrankvdStam/mem-rs/actions/workflows/build.yml/badge.svg)](https://github.com/FrankvdStam/mem-rs/actions/workflows/build.yml)  
+[![build](https://github.com/FrankvdStam/mem-rs/actions/workflows/build.yml/badge.svg)](https://github.com/FrankvdStam/mem-rs/actions/workflows/build.yml) 
+[![build](https://img.shields.io/discord/1359073517840105603)](https://discord.gg/CEuyqQrrmP) 
+[![Coverage](https://sonarqube.wastedcloud.nl/api/project_badges/measure?project=mem-rs&metric=coverage&token=sqb_454636e461b93bc747391609047ebed6eb03e8ee)](https://sonarqube.wastedcloud.nl/dashboard?id=mem-rs)  
+  
 Memory manipulation library for running processes, mainly aimed at games.
 
 ## Features

@@ -15,8 +15,11 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 use std::cell::RefCell;
+use std::ffi::c_void;
 use std::rc::Rc;
-use windows::Win32::Foundation::HANDLE;
+use windows::Win32::Foundation::{CloseHandle, HANDLE};
+use windows::Win32::System::Memory::{VirtualProtectEx, PAGE_PROTECTION_FLAGS};
+use windows::Win32::System::Threading::{OpenProcess, PROCESS_VM_OPERATION};
 use crate::memory::MemoryType;
 use crate::process_data::{ProcessData};
 use crate::process_module::ProcessModule;
@@ -172,5 +175,23 @@ impl Process
     pub fn get_memory_type(&self) -> MemoryType
     {
         return self.process_data.borrow().memory_type.clone();
+    }
+
+    ///Sets the page protection and returns the old page protection
+    pub fn set_page_protection(&self, address: usize, size: usize, protection: PAGE_PROTECTION_FLAGS) -> PAGE_PROTECTION_FLAGS
+    {
+        //let handle = unsafe{ OpenProcess(PROCESS_VM_OPERATION, false, self.id as u32).expect("OpenProcess failed") };
+        let mut old = PAGE_PROTECTION_FLAGS(0);
+        unsafe{
+            VirtualProtectEx(
+                self.get_handle(),
+                address as *const c_void,
+                size,
+                protection,
+                &mut old
+            ).expect("VirtualProtect failed");
+        }
+        //unsafe{ CloseHandle(handle).expect("CloseHandle failed"); }
+        old
     }
 }

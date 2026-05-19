@@ -713,3 +713,4 @@ pub trait ReadWrite: BaseReadWrite
         self.write_memory_abs(address, &buffer);
     }
 }
+

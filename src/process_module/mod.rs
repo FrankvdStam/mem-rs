@@ -17,10 +17,14 @@
 mod read_write;
 
 use std::cell::RefCell;
+use std::ffi::c_void;
 use std::mem;
 use std::rc::Rc;
+use windows::Win32::Foundation::CloseHandle;
 use windows::Win32::System::Diagnostics::Debug::{IMAGE_NT_HEADERS32, IMAGE_NT_HEADERS64};
+use windows::Win32::System::Memory::{VirtualProtectEx, PAGE_PROTECTION_FLAGS, PAGE_READWRITE};
 use windows::Win32::System::SystemServices::{IMAGE_DOS_HEADER, IMAGE_EXPORT_DIRECTORY};
+use windows::Win32::System::Threading::{OpenProcess, PROCESS_ALL_ACCESS, PROCESS_VM_OPERATION};
 use crate::memory::{BaseReadWrite, ReadWrite};
 use crate::process_data::ProcessData;
 
@@ -67,7 +71,7 @@ impl ProcessModule
     pub fn dump_memory(&mut self)
     {
         let mut buffer: Vec<u8> = vec![0; self.size];
-        if !self.read_memory_abs(self.base_address, &mut buffer)
+        if self.read_memory_abs(self.base_address, &mut buffer).is_err()
         {
             return;
         }
