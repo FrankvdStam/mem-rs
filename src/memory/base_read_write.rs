@@ -73,7 +73,7 @@ pub trait BaseReadWrite
     /// Read memory into a buffer from a process handle
     fn read_with_handle(&self, handle: HANDLE, memory_type: MemoryType, address: usize, buffer: &mut [u8]) -> Result<(), ()>
     {
-        return match memory_type
+        match memory_type
         {
             MemoryType::Win32Api =>
             {
@@ -102,7 +102,7 @@ pub trait BaseReadWrite
     /// Write from a buffer ino memory from a process handle
     fn write_with_handle(&self, handle: HANDLE, memory_type: MemoryType, address: usize, buffer: &[u8]) -> Result<(), ()>
     {
-        return match memory_type
+        match memory_type
         {
             MemoryType::Win32Api =>
             {
@@ -120,7 +120,7 @@ pub trait BaseReadWrite
                 {
                     return Err(());
                 }
-                unsafe{ ptr::write_volatile(address as *mut &[u8], buffer); }
+                unsafe{ ptr::write_unaligned(address as *mut &[u8], buffer); }
                 return Ok(());
             },
         }
