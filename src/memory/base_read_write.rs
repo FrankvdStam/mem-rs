@@ -1,6 +1,6 @@
 use std::ffi::c_void;
-use std::ptr;
-use windows::Win32::Foundation::HANDLE;
+use std::{ptr, slice};
+use windows::Win32::Foundation::{GetLastError, HANDLE};
 use windows::Win32::System::Diagnostics::Debug::{ReadProcessMemory, WriteProcessMemory};
 use crate::memory::MemoryType;
 
@@ -110,6 +110,7 @@ pub trait BaseReadWrite
                 if unsafe { WriteProcessMemory(handle, address as *mut c_void, buffer.as_ptr() as *mut c_void, buffer.len(), Some(&mut wrote_bytes)).is_err() }
                     || wrote_bytes != buffer.len()
                 {
+                    let err = unsafe{ GetLastError() };
                     return Err(());
                 }
                 return Ok(());
@@ -120,7 +121,14 @@ pub trait BaseReadWrite
                 {
                     return Err(());
                 }
-                unsafe{ ptr::write_unaligned(address as *mut &[u8], buffer); }
+
+                //there is probably a way to write the entire buffer at once, but it seems most of rust's functions work on some T, not on a byte array
+                //there is also the requirement of working on unaligned addresses; any address should be writable. That's currently not the case for many rust functions.
+                for i in 0..buffer.len()
+                {
+                    unsafe{ ptr::write_unaligned((address + i) as *mut u8, buffer[i]) };
+                }
+
                 return Ok(());
             },
         }

@@ -1,12 +1,12 @@
 mod game_object;
 mod memory_read_write_tests;
 
-use std::io::Read;
 use std::process::{Command, Stdio};
 use std::thread;
 use std::time::Duration;
 use test_binary::{build_test_binary, build_test_binary_once};
 use windows::Win32::Foundation::{CloseHandle, MAX_PATH};
+use windows::Win32::System::Memory::VirtualProtectEx;
 use windows::Win32::System::ProcessStatus::K32GetModuleFileNameExW;
 use windows::Win32::System::Threading::{OpenProcess, PROCESS_QUERY_INFORMATION, PROCESS_VM_OPERATION, PROCESS_VM_READ, PROCESS_VM_WRITE};
 use crate::helpers::{get_file_name_from_string, w32str_to_string};
@@ -14,7 +14,6 @@ use crate::memory::MemoryType;
 use crate::prelude::{Process, ReadWrite};
 use crate::tests::game_object::read_game_object_health;
 
-build_test_binary_once!(test_binary, "testbins");
 
 pub struct MockProcess
 {
@@ -54,6 +53,8 @@ impl MockProcess
             },
             MemoryType::Win32Api =>
             {
+                build_test_binary_once!(test_binary, "testbins");
+
                 let test_bin_path = path_to_test_binary();
 
                 let mut child_process = Command::new(test_bin_path)
@@ -79,11 +80,13 @@ impl MockProcess
                             )
                         }
                 {
+                    //get file name
                     if unsafe{ K32GetModuleFileNameExW(Some(handle), None, &mut mod_name) } != 0
                     {
                         let file_path = w32str_to_string(&mod_name.to_vec());
                         process_name = get_file_name_from_string(&file_path);
                     }
+
                     let _ = unsafe{ CloseHandle(handle) };
                 }
                 if process_name.is_empty()

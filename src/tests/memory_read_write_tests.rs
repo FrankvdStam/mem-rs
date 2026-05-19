@@ -1,3 +1,5 @@
+use std::mem;
+use windows::Win32::System::Memory::PAGE_READWRITE;
 use crate::prelude::*;
 use crate::tests::game_object::{GameObject, StructWithAllTypes};
 use crate::tests::MockProcess;
@@ -40,33 +42,34 @@ pub fn memory_read_write_asserts(mock_process: &mut MockProcess)
     assert_eq!(struct_with_all_types_pointer.read_f64_rel (Some(GameObject::OFFSET_STRUCT_WITH_ALL_TYPES + StructWithAllTypes::OFFSET_F64)), 8.0f64);
 
     assert_eq!(struct_with_all_types_pointer.read_bool_rel(Some(GameObject::OFFSET_STRUCT_WITH_ALL_TYPES + StructWithAllTypes::OFFSET_BOOL)), true);
-    struct_with_all_types_pointer.debug = true;
 
-    //struct_with_all_types_pointer.write_i8_rel  (Some(GameObject::OFFSET_STRUCT_WITH_ALL_TYPES + StructWithAllTypes::OFFSET_I8), 9);
+    let base = struct_with_all_types_pointer.get_base_address();
+    let size = mem::size_of::<StructWithAllTypes>();
 
-    //struct_with_all_types_pointer.write_i8_rel  (Some(0x1c + 0x00), 9);
-    //struct_with_all_types_pointer.write_i32_rel (Some(0x1c + 0x01), 10);
-    //struct_with_all_types_pointer.write_i64_rel (Some(0x1c + 0x05), 11);
+    //make sure we have write access to the page. The rust compiler tends to put the data in a read-only page.
+    let _ = mock_process.process.set_page_protection(base, size, PAGE_READWRITE);
 
-    //struct_with_all_types_pointer.write_u8_rel  (Some(0x1c + 0x0d), 12);
+    //write all values
+    struct_with_all_types_pointer.write_i8_rel  (Some(GameObject::OFFSET_STRUCT_WITH_ALL_TYPES + StructWithAllTypes::OFFSET_I8), 9);
+    struct_with_all_types_pointer.write_i32_rel (Some(GameObject::OFFSET_STRUCT_WITH_ALL_TYPES + StructWithAllTypes::OFFSET_I32), 10);
+    struct_with_all_types_pointer.write_i64_rel (Some(GameObject::OFFSET_STRUCT_WITH_ALL_TYPES + StructWithAllTypes::OFFSET_I64), 11);
+
+    struct_with_all_types_pointer.write_u8_rel  (Some(GameObject::OFFSET_STRUCT_WITH_ALL_TYPES + StructWithAllTypes::OFFSET_U8), 12);
     struct_with_all_types_pointer.write_u32_rel (Some(GameObject::OFFSET_STRUCT_WITH_ALL_TYPES + StructWithAllTypes::OFFSET_U32), 13);
-    //struct_with_all_types_pointer.write_u64_rel (Some(0x1c + 0x12), 14);
+    struct_with_all_types_pointer.write_u64_rel (Some(GameObject::OFFSET_STRUCT_WITH_ALL_TYPES + StructWithAllTypes::OFFSET_U64), 14);
 
-    //struct_with_all_types_pointer.write_f32_rel (Some(0x1c + 0x1a), 15.0f32);
-    //struct_with_all_types_pointer.write_f64_rel (Some(0x1c + 0x1e), 16.0f64);
+    struct_with_all_types_pointer.write_f32_rel (Some(GameObject::OFFSET_STRUCT_WITH_ALL_TYPES + StructWithAllTypes::OFFSET_F32), 15.0f32);
+    struct_with_all_types_pointer.write_f64_rel (Some(GameObject::OFFSET_STRUCT_WITH_ALL_TYPES + StructWithAllTypes::OFFSET_F64), 16.0f64);
 
-    // struct_with_all_types_pointer.writ(Some(0x1c + 0x26)), true);
+    //now check if all values where written
+    assert_eq!(struct_with_all_types_pointer.read_i8_rel  (Some(GameObject::OFFSET_STRUCT_WITH_ALL_TYPES + StructWithAllTypes::OFFSET_I8)), 9);
+    assert_eq!(struct_with_all_types_pointer.read_i32_rel (Some(GameObject::OFFSET_STRUCT_WITH_ALL_TYPES + StructWithAllTypes::OFFSET_I32)), 10);
+    assert_eq!(struct_with_all_types_pointer.read_i64_rel (Some(GameObject::OFFSET_STRUCT_WITH_ALL_TYPES + StructWithAllTypes::OFFSET_I64)), 11);
 
-    //assert_eq!(struct_with_all_types_pointer.read_i8_rel  (Some(GameObject::OFFSET_STRUCT_WITH_ALL_TYPES + StructWithAllTypes::OFFSET_I8)), 9);
-    //assert_eq!(struct_with_all_types_pointer.read_i32_rel (Some(0x1c + 0x01)), 10);
-    //assert_eq!(struct_with_all_types_pointer.read_i64_rel (Some(0x1c + 0x05)), 11);
-    //
-    //assert_eq!(struct_with_all_types_pointer.read_u8_rel  (Some(0x1c + 0x0d)), 12);
+    assert_eq!(struct_with_all_types_pointer.read_u8_rel  (Some(GameObject::OFFSET_STRUCT_WITH_ALL_TYPES + StructWithAllTypes::OFFSET_U8)), 12);
     assert_eq!(struct_with_all_types_pointer.read_u32_rel (Some(GameObject::OFFSET_STRUCT_WITH_ALL_TYPES + StructWithAllTypes::OFFSET_U32)), 13);
-    //assert_eq!(struct_with_all_types_pointer.read_u64_rel (Some(0x1c + 0x12)), 14);
-    //
-    //assert_eq!(struct_with_all_types_pointer.read_f32_rel (Some(0x1c + 0x1a)), 15.0f32);
-    //assert_eq!(struct_with_all_types_pointer.read_f64_rel (Some(0x1c + 0x1e)), 16.0f64);
-    //
-    //assert_eq!(struct_with_all_types_pointer.read_bool_rel(Some(0x1c + 0x26)), true);
+    assert_eq!(struct_with_all_types_pointer.read_u64_rel (Some(GameObject::OFFSET_STRUCT_WITH_ALL_TYPES + StructWithAllTypes::OFFSET_U64)), 14);
+
+    assert_eq!(struct_with_all_types_pointer.read_f32_rel (Some(GameObject::OFFSET_STRUCT_WITH_ALL_TYPES + StructWithAllTypes::OFFSET_F32)), 15.0f32);
+    assert_eq!(struct_with_all_types_pointer.read_f64_rel (Some(GameObject::OFFSET_STRUCT_WITH_ALL_TYPES + StructWithAllTypes::OFFSET_F64)), 16.0f64);
 }
